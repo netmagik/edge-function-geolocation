@@ -1,81 +1,58 @@
+import repoLink from "../../components/repo-link.js";
+import geolocationInfo from "../../components/geolocation-info.js";
+
 export default {
-  title: "Home",
-  metaDescription: "Explore our library of Edge Function examples and deploy your own to Netlify.",
-  page: function () {
+  title: "Geolocation",
+  metaDescription:
+    "Use Netlify Edge Functions to get information about a user's location to serve location-specific content.",
+  page: function ({ geo }) {
     return `
-    <section class="home__section">
-    <h2>Examples</h2>
-    <p>
-      Explore the examples below, or over in the <a href="https://github.com/netlify/edge-functions-examples" target="_BLANK" rel="noopener">GitHub repository</a> for this site.
-    </p>
-    </section>
+    <section>
+      <h1>Geolocation</h1>
+      <p>You can use Edge Functions to get information about a user's location to serve location-specific content and personalize their experience.</p>
+      
+      ${geolocationInfo({
+        city: geo?.city,
+        countryCode: geo?.country?.code,
+        countryName: geo?.country?.name,
+        latitude: geo?.latitude,
+        longitude: geo?.longitude,
+        timezone: geo?.timezone,
+      })}
+      
+      <p>Geolocation information is available on the <code>Context.geo</code> object.</p>
 
-    <section class="home__section">
-      <h3 class="home__sectionHeader">Responses</h3>
-      <ul class="home__sectionList">
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/hello">Hello world</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/json">Return JSON</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/image">Return an image</a></li>
-      </ul>
-    </section>
+      <pre><code>import { Context } from "https://edge.netlify.com";
 
-    <section class="home__section">
-    <h3 class="home__sectionHeader">Rewrites and proxies</h3>
-    <ul class="home__sectionList">
-    <li class="home__sectionListItem home__sectionListItem"><a class="home__sectionListItemLink" href="/example/rewrite">Rewrite responses from another URL</a></li>
-    <li class="home__sectionListItem home__sectionListItem"><a class="home__sectionListItemLink" href="/example/proxy-requests">Proxy requests to another source</a></li>
-    </ul>
-    </section>
-    
-    <section class="home__section">
-    <h3 class="home__sectionHeader">HTTP Headers</h3>
-    <ul class="home__sectionList">
-    <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/set-request-header">Set custom HTTP request headers</a></li>
-    <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/set-response-header">Set custom HTTP response headers</a></li>
-    </ul>
-    </section>
-    
-    <section class="home__section">
-      <h3 class="home__sectionHeader">Transforming responses</h3>
-      <ul class="home__sectionList">
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/transform">Text transformations</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/include">Content includes</a></li>
-      </ul>
-    </section>
-    
-    <section class="home__section">
-      <h3 class="home__sectionHeader">Geolocation</h3>
-      <ul class="home__sectionList">
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/geolocation">Determine a user's location</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/country-block">Block content according to country</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/localized-content">Serve localized content</a></li>
-      </ul>
-    </section>
+export default async (request: Request, context: Context) => {
+  // Here's what's available on context.geo
 
-    <section class="home__section">
-      <h3 class="home__sectionHeader">Cookies</h3>
-      <ul class="home__sectionList">
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/cookies-set">Set cookies</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/cookies-read">Read cookies</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/cookies-delete">Delete cookies</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/abtest">Set up an A/B test using cookies</a></li>
-      </ul>
-    </section>
+  // context: {
+  //   geo: {
+  //     city?: string;
+  //     country?: {
+  //       code?: string;
+  //       name?: string;
+  //     },
+  //     subdivision?: {
+  //       code?: string;
+  //       name?: string;
+  //     },
+  //     latitude?: number;
+  //     longitude?: number;
+  //     timezone?: string;
+  //   }
+  // }
 
-    <section class="home__section">
-      <h3 class="home__sectionHeader">WebAssembly</h3>
-      <ul class="home__sectionList">
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/wasm">Edge WebAssembly</a></li>
-      </ul>
-    </section>
-
-    <section class="home__section">
-      <h3 class="home__sectionHeader">Environment and debugging</h3>
-      <ul class="home__sectionList">
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/log">Write to the logs</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/environment">Use environment variables</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/uncaught-exceptions">Read logs for uncaught exceptions</a></li>
-        <li class="home__sectionListItem"><a class="home__sectionListItemLink" href="/example/context-site">Access site information</a></li>
+  return context.json({
+    geo: context.geo,
+    header: request.headers.get("x-nf-geo"),
+  });
+};</code></pre>
+      <h2>See this in action</h2>
+      <ul>
+        <li>View your raw geolocation data at <a href="/geolocation">/geolocation</a></li>
+        <li>${repoLink("geolocation.ts")}</li>
       </ul>
     </section>
   `;

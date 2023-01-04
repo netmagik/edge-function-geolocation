@@ -38,10 +38,6 @@
   function = "json"
 
 [[edge_functions]]
-  path = "/cookies"
-  function = "cookies"
-
-[[edge_functions]]
   path = "/rewrite"
   function = "rewrite"
 
